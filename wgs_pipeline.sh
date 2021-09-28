@@ -2,7 +2,7 @@
 
 ### Human Whole Genome Sequencing Data Analysis Pipeline (HWGS-PIPLINE)
 ### Version 1.0 (Sep 12, 2021)
-### Copyright 2021 Usama Bakry (u.bakry@icloud.com)
+### Copyright 2021 Usama Bakry and Ahmed ElHossieny
 
 ## Command line options
 ## -----------------------------------------------------------------------------
