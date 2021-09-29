@@ -46,7 +46,7 @@ time {
 ## -----------------------------------------------------------------------------                     
 echo -e "[     INFO    ] Human Whole Genome Sequencing Data Analysis Pipeline (HWGS-PIPLINE)"
 echo -e "[     INFO    ] Version 1.0 (Sep 12, 2021)"
-echo -e "[     INFO    ] Copyright 2021 Usama Bakry (u.bakry@icloud.com)\n"
+echo -e "[     INFO    ] Copyright 2021 Usama Bakry and Ahmed ElHossieny\n"
 ## -----------------------------------------------------------------------------  
 
 ## Print user args
@@ -135,15 +135,17 @@ echo -e "[      OK     ] Mapping is done.\n"
 time {
 echo -e "[   PROCESS   ] Variant calling..."
 
-# Create mapping subfolder
+# Create variant calling subfolder
 VC_DIR=${OUTPUT}/03_Variant_Calling/
 mkdir -p $VC_DIR
 
-# GATK command
+# Zipping and indexing required files
 bgzip -c /data1/ref/UCSC_GRCh38/hg38.fa > /data1/ref/UCSC_GRCh38/hg38_bgzip.fa.gz
 gatk CreateSequenceDictionary -R /data1/ref/UCSC_GRCh38/hg38_bgzip.fa.gz
 samtools faidx /data1/ref/UCSC_GRCh38/hg38_bgzip.fa.gz
 samtools index ${M_DIR}/${SAMPLE_NAME}.sorted.bam
+
+# GATK command
 gatk --java-options "-Xmx400g" HaplotypeCaller  \
    -R /data1/ref/UCSC_GRCh38/hg38_bgzip.fa.gz \
    -I ${M_DIR}/${SAMPLE_NAME}.sorted.bam \
@@ -156,6 +158,32 @@ gatk --java-options "-Xmx400g" GenotypeGVCFs \
    -O ${VC_DIR}/${SAMPLE_NAME}.vcf.gz
 
 echo -e "[      OK     ] Variant calling is done.\n"
+}
+## -----------------------------------------------------------------------------
+
+## Variants annotation
+## -----------------------------------------------------------------------------
+time {
+echo -e "[   PROCESS   ] Variants annotation..."
+
+# Create annotation subfolder
+VA_DIR=${OUTPUT}/04_Annotation/
+mkdir -p $VA_DIR
+
+# Unzip the vcf file
+gunzip -k ${VC_DIR}/${SAMPLE_NAME}.vcf.gz
+
+# VEP command
+vep --input_file ${VC_DIR}/${SAMPLE_NAME}.vcf \
+    --format vcf \
+    --output_file $VA_DIR/${SAMPLE_NAME}.annot.vcf \
+    --cache --warning_file $VA_DIR/${SAMPLE_NAME}.warning.log \
+    --fork $THREADS \
+    --everything \
+    --verbose \
+    --force_overwrite
+
+echo -e "[      OK     ] Annotation is done.\n"
 }
 ## -----------------------------------------------------------------------------
 
