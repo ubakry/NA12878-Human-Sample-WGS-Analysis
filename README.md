@@ -22,4 +22,5 @@ wget -c https://ftp-trace.ncbi.nih.gov/giab/ftp/release/NA12878_HG001/latest/GRC
 - tabix
 - BCFTools
 - VCFTools
+- VEP
 
